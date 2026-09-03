@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Code Executor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Code Executor</h1>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="html">HTML</button>
+            <button class="tab-btn" data-tab="css">CSS</button>
+            <button class="tab-btn" data-tab="js">JavaScript</button>
+        </div>
+
+        <div class="tab-content active" id="html-tab">
+            <textarea id="htmlCode" placeholder="Digite seu código HTML aqui..."></textarea>
+        </div>
+
+        <div class="tab-content" id="css-tab">
+            <textarea id="cssCode" placeholder="Digite seu código CSS aqui..."></textarea>
+        </div>
+
+        <div class="tab-content" id="js-tab">
+            <textarea id="jsCode" placeholder="Digite seu código JavaScript aqui..."></textarea>
+        </div>
+
+        <div class="buttons">
+            <button id="executeBtn" class="btn btn-primary">Executar</button>
+            <button id="clearBtn" class="btn btn-secondary">Limpar</button>
+            <button id="newWindowBtn" class="btn btn-tertiary">Abrir em Janela</button>
+        </div>
+    </div>
+
+    <div id="preview" class="preview">
+        <div class="preview-header">
+            <span>Preview</span>
+            <button id="closePreview" class="close-btn">✕</button>
+        </div>
+        <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
