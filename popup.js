@@ -1,7 +1,6 @@
-// Estado da extensão
 let panelOpen = false;
+let model = null;
 
-// Elementos do DOM
 const floatingBtn = document.getElementById('floatingBtn');
 const editorPanel = document.getElementById('editorPanel');
 const overlay = document.getElementById('overlay');
@@ -16,43 +15,44 @@ floatingBtn.addEventListener('click', () => {
     overlay.classList.toggle('active');
 });
 
-// Fechar painel com X
 closeBtn.addEventListener('click', () => {
     panelOpen = false;
     editorPanel.classList.remove('active');
     overlay.classList.remove('active');
 });
 
-// Fechar painel com overlay (apenas o overlay fica funcional, não o painel)
 overlay.addEventListener('click', () => {
     panelOpen = false;
     editorPanel.classList.remove('active');
     overlay.classList.remove('active');
 });
 
-// Impedir que cliques dentro do painel fechem ele
 editorPanel.addEventListener('click', (e) => {
     e.stopPropagation();
 });
 
-// Previnir que cliques no painel fechem a extensão
-editorPanel.addEventListener('mousedown', (e) => {
-    if (e.target.closest('.editor-content, .panel-header')) {
-        e.stopPropagation();
-    }
+// Abas principais
+const mainTabBtns = document.querySelectorAll('.main-tab-btn');
+const mainTabContents = document.querySelectorAll('.main-tab-content');
+
+mainTabBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+        mainTabBtns.forEach(b => b.classList.remove('active'));
+        mainTabContents.forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        const tabName = this.getAttribute('data-main-tab');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+    });
 });
 
-// Sistema de Abas
+// Abas de código
 const tabBtns = document.querySelectorAll('.tab-btn');
 const tabContents = document.querySelectorAll('.tab-content');
 
 tabBtns.forEach(btn => {
     btn.addEventListener('click', function() {
-        // Remove active de todos
         tabBtns.forEach(b => b.classList.remove('active'));
         tabContents.forEach(c => c.classList.remove('active'));
-
-        // Adiciona active ao clicado
         this.classList.add('active');
         const tabName = this.getAttribute('data-tab');
         document.getElementById(`${tabName}-tab`).classList.add('active');
@@ -76,15 +76,8 @@ function executeCode() {
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-                body {
-                    padding: 20px;
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                }
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body { padding: 20px; font-family: sans-serif; }
                 ${cssCode}
             </style>
         </head>
@@ -101,73 +94,30 @@ function executeCode() {
     previewPanel.classList.add('active');
 }
 
-// Preview em nova aba
-document.getElementById('previewBtn').addEventListener('click', function() {
-    const htmlCode = document.getElementById('htmlCode').value;
-    const cssCode = document.getElementById('cssCode').value;
-    const jsCode = document.getElementById('jsCode').value;
-
-    const fullHTML = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Code Executor - Preview</title>
-            <style>
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-                body {
-                    padding: 20px;
-                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                }
-                ${cssCode}
-            </style>
-        </head>
-        <body>
-            ${htmlCode}
-            <script>
-                ${jsCode}
-            </script>
-        </body>
-        </html>
-    `;
-
-    const blob = new Blob([fullHTML], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    chrome.tabs.create({ url: url });
-});
-
-// Fechar preview
 closePreviewBtn.addEventListener('click', () => {
     previewPanel.classList.remove('active');
 });
 
 // Limpar código
 document.getElementById('clearBtn').addEventListener('click', function() {
-    if (confirm('Tem certeza que deseja limpar tudo? Essa ação não pode ser desfeita.')) {
+    if (confirm('Limpar tudo?')) {
         document.getElementById('htmlCode').value = '';
         document.getElementById('cssCode').value = '';
         document.getElementById('jsCode').value = '';
-        localStorage.removeItem('htmlCode');
-        localStorage.removeItem('cssCode');
-        localStorage.removeItem('jsCode');
-        previewPanel.classList.remove('active');
+        localStorage.clear();
     }
 });
 
-// Auto-save em localStorage
+// Auto-save
 const textareas = document.querySelectorAll('textarea');
 textareas.forEach(ta => {
     ta.addEventListener('input', debounce(function() {
         localStorage.setItem(this.id, this.value);
     }, 500));
+    const saved = localStorage.getItem(ta.id);
+    if (saved) ta.value = saved;
 });
 
-// Função de debounce
 function debounce(func, delay) {
     let timeoutId;
     return function(...args) {
@@ -176,37 +126,58 @@ function debounce(func, delay) {
     };
 }
 
-// Carregar código salvo
-window.addEventListener('load', function() {
-    textareas.forEach(ta => {
-        const saved = localStorage.getItem(ta.id);
-        if (saved) {
-            ta.value = saved;
+// IMAGE LENS
+const imageInput = document.getElementById('imageInput');
+const previewImage = document.getElementById('previewImage');
+const analyzeBtn = document.getElementById('analyzeBtn');
+const lensResults = document.getElementById('lensResults');
+
+imageInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        previewImage.src = event.target.result;
+        previewImage.style.display = 'block';
+        analyzeBtn.style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+});
+
+analyzeBtn.addEventListener('click', analyzeImage);
+
+async function loadModel() {
+    if (!model) {
+        try {
+            model = await mobilenet.load();
+        } catch(e) {
+            lensResults.innerHTML = '<div class="lens-result-item">Erro ao carregar modelo</div>';
         }
-    });
-});
-
-// Fechar preview ao clicar fora
-document.addEventListener('click', (e) => {
-    if (!previewPanel.contains(e.target) && e.target.id !== 'previewBtn') {
-        // Preview fica aberto até fechar manualmente
     }
-});
+}
 
-// Impedir que cliques no preview fechem o painel
-previewPanel.addEventListener('click', (e) => {
-    e.stopPropagation();
-});
+async function analyzeImage() {
+    if (!previewImage.src) return;
+    await loadModel();
+    
+    try {
+        const predictions = await model.classify(previewImage);
+        let html = '';
+        predictions.forEach((p, i) => {
+            html += `<div class="lens-result-item"><span class="result-label">${i+1}. ${p.className}</span><br><span class="result-confidence">${(p.probability * 100).toFixed(1)}%</span></div>`;
+        });
+        lensResults.innerHTML = html;
+    } catch(e) {
+        lensResults.innerHTML = '<div class="lens-result-item">Erro na análise</div>';
+    }
+}
 
-// Shortcuts de teclado
+// Shortcuts
 document.addEventListener('keydown', (e) => {
-    // Ctrl/Cmd + Enter para executar
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
         executeCode();
     }
-
-    // Esc para fechar painel
     if (e.key === 'Escape' && panelOpen) {
         e.preventDefault();
         panelOpen = false;

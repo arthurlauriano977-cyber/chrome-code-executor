@@ -18,51 +18,67 @@
             <button id="closeBtn" class="close-panel-btn">✕</button>
         </div>
 
-        <div class="editor-content">
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="html">
-                    <span class="tab-icon">&lt;</span> HTML
-                </button>
-                <button class="tab-btn" data-tab="css">
-                    <span class="tab-icon">◊</span> CSS
-                </button>
-                <button class="tab-btn" data-tab="js">
-                    <span class="tab-icon">{ }</span> JavaScript
-                </button>
+        <!-- Abas principais -->
+        <div class="main-tabs">
+            <button class="main-tab-btn active" data-main-tab="editor">
+                &lt; Editor
+            </button>
+            <button class="main-tab-btn" data-main-tab="lens">
+                🔍 Lens
+            </button>
+        </div>
+
+        <!-- Painel do Editor de Código -->
+        <div class="main-tab-content active" id="editor-tab">
+            <div class="editor-content">
+                <div class="code-tabs">
+                    <button class="tab-btn active" data-tab="html">HTML</button>
+                    <button class="tab-btn" data-tab="css">CSS</button>
+                    <button class="tab-btn" data-tab="js">JS</button>
+                </div>
+
+                <div class="editors">
+                    <div class="tab-content active" id="html-tab">
+                        <textarea id="htmlCode" placeholder="Digite seu código HTML..." spellcheck="false"></textarea>
+                    </div>
+                    <div class="tab-content" id="css-tab">
+                        <textarea id="cssCode" placeholder="Digite seu código CSS..." spellcheck="false"></textarea>
+                    </div>
+                    <div class="tab-content" id="js-tab">
+                        <textarea id="jsCode" placeholder="Digite seu código JavaScript..." spellcheck="false"></textarea>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="executeBtn" class="btn btn-primary">▶ Executar</button>
+                    <button id="clearBtn" class="btn btn-danger">🗑 Limpar</button>
+                </div>
             </div>
+        </div>
 
-            <div class="editors">
-                <div class="tab-content active" id="html-tab">
-                    <textarea id="htmlCode" placeholder="&lt;!DOCTYPE html&gt;&#10;&lt;html&gt;&#10;&lt;body&gt;&#10;  &lt;h1&gt;Olá Mundo!&lt;/h1&gt;&#10;&lt;/body&gt;&#10;&lt;/html&gt;" spellcheck="false"></textarea>
+        <!-- Painel do Image Lens -->
+        <div class="main-tab-content" id="lens-tab">
+            <div class="lens-content">
+                <div class="lens-input-group">
+                    <input type="file" id="imageInput" accept="image/*" class="image-input">
+                    <label for="imageInput" class="image-label">📷 Selecione uma imagem</label>
                 </div>
 
-                <div class="tab-content" id="css-tab">
-                    <textarea id="cssCode" placeholder="body {&#10;  font-family: Arial;&#10;  background: #f0f0f0;&#10;}&#10;&#10;h1 {&#10;  color: #4285F4;&#10;}" spellcheck="false"></textarea>
+                <div id="imageContainer" class="image-container">
+                    <img id="previewImage" style="display:none; max-width: 100%; border-radius: 8px;">
                 </div>
 
-                <div class="tab-content" id="js-tab">
-                    <textarea id="jsCode" placeholder="console.log('Hello World!');&#10;&#10;// Seu código aqui..." spellcheck="false"></textarea>
-                </div>
-            </div>
+                <div id="lensResults" class="lens-results"></div>
 
-            <div class="button-group">
-                <button id="executeBtn" class="btn btn-primary">
-                    <span class="btn-icon">▶</span> Executar
-                </button>
-                <button id="previewBtn" class="btn btn-secondary">
-                    <span class="btn-icon">👁</span> Preview
-                </button>
-                <button id="clearBtn" class="btn btn-danger">
-                    <span class="btn-icon">🗑</span> Limpar
-                </button>
+                <button id="analyzeBtn" class="btn btn-secondary" style="display:none;">🔍 Analisar</button>
             </div>
         </div>
     </div>
 
-    <!-- Overlay (para impedir cliques fora) -->
+    <!-- Overlay -->
     <div id="overlay" class="overlay"></div>
 
-    <!-- Preview em nova aba -->
+    <!-- Preview -->
     <div id="previewPanel" class="preview-panel">
         <div class="preview-header">
             <span>Preview</span>
@@ -71,6 +87,8 @@
         <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
     <script src="popup.js"></script>
 </body>
 </html>
