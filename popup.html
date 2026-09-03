@@ -6,40 +6,69 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Code Executor</h1>
-        
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="html">HTML</button>
-            <button class="tab-btn" data-tab="css">CSS</button>
-            <button class="tab-btn" data-tab="js">JavaScript</button>
+    <!-- Botão flutuante para abrir o editor -->
+    <button id="floatingBtn" class="floating-btn" title="Code Executor">
+        <span class="code-icon">&lt;/&gt;</span>
+    </button>
+
+    <!-- Painel do editor -->
+    <div id="editorPanel" class="editor-panel">
+        <div class="panel-header">
+            <h1>Code Executor</h1>
+            <button id="closeBtn" class="close-panel-btn">✕</button>
         </div>
 
-        <div class="tab-content active" id="html-tab">
-            <textarea id="htmlCode" placeholder="Digite seu código HTML aqui..."></textarea>
-        </div>
+        <div class="editor-content">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="html">
+                    <span class="tab-icon">&lt;</span> HTML
+                </button>
+                <button class="tab-btn" data-tab="css">
+                    <span class="tab-icon">◊</span> CSS
+                </button>
+                <button class="tab-btn" data-tab="js">
+                    <span class="tab-icon">{ }</span> JavaScript
+                </button>
+            </div>
 
-        <div class="tab-content" id="css-tab">
-            <textarea id="cssCode" placeholder="Digite seu código CSS aqui..."></textarea>
-        </div>
+            <div class="editors">
+                <div class="tab-content active" id="html-tab">
+                    <textarea id="htmlCode" placeholder="&lt;!DOCTYPE html&gt;&#10;&lt;html&gt;&#10;&lt;body&gt;&#10;  &lt;h1&gt;Olá Mundo!&lt;/h1&gt;&#10;&lt;/body&gt;&#10;&lt;/html&gt;" spellcheck="false"></textarea>
+                </div>
 
-        <div class="tab-content" id="js-tab">
-            <textarea id="jsCode" placeholder="Digite seu código JavaScript aqui..."></textarea>
-        </div>
+                <div class="tab-content" id="css-tab">
+                    <textarea id="cssCode" placeholder="body {&#10;  font-family: Arial;&#10;  background: #f0f0f0;&#10;}&#10;&#10;h1 {&#10;  color: #4285F4;&#10;}" spellcheck="false"></textarea>
+                </div>
 
-        <div class="buttons">
-            <button id="executeBtn" class="btn btn-primary">Executar</button>
-            <button id="clearBtn" class="btn btn-secondary">Limpar</button>
-            <button id="newWindowBtn" class="btn btn-tertiary">Nova Aba</button>
+                <div class="tab-content" id="js-tab">
+                    <textarea id="jsCode" placeholder="console.log('Hello World!');&#10;&#10;// Seu código aqui..." spellcheck="false"></textarea>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button id="executeBtn" class="btn btn-primary">
+                    <span class="btn-icon">▶</span> Executar
+                </button>
+                <button id="previewBtn" class="btn btn-secondary">
+                    <span class="btn-icon">👁</span> Preview
+                </button>
+                <button id="clearBtn" class="btn btn-danger">
+                    <span class="btn-icon">🗑</span> Limpar
+                </button>
+            </div>
         </div>
     </div>
 
-    <div id="preview" class="preview">
+    <!-- Overlay (para impedir cliques fora) -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Preview em nova aba -->
+    <div id="previewPanel" class="preview-panel">
         <div class="preview-header">
             <span>Preview</span>
-            <button id="closePreview" class="close-btn">✕</button>
+            <button id="closePreviewBtn" class="close-preview-btn">✕</button>
         </div>
-        <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin"></iframe>
+        <iframe id="previewFrame" sandbox="allow-scripts allow-same-origin allow-modals"></iframe>
     </div>
 
     <script src="popup.js"></script>
