@@ -1,11 +1,9 @@
 // Tab switching
 document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        // Remove active class from all buttons and content
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-        // Add active class to clicked button and corresponding content
         this.classList.add('active');
         const tabName = this.getAttribute('data-tab');
         document.getElementById(`${tabName}-tab`).classList.add('active');
@@ -23,7 +21,6 @@ function executeCode() {
     const iframe = document.getElementById('previewFrame');
     const preview = document.getElementById('preview');
 
-    // Create complete HTML document
     const fullHTML = `
         <!DOCTYPE html>
         <html>
@@ -42,7 +39,6 @@ function executeCode() {
         </html>
     `;
 
-    // Write to iframe
     iframe.srcdoc = fullHTML;
     preview.classList.add('active');
 }
@@ -91,7 +87,7 @@ document.getElementById('closePreview').addEventListener('click', function() {
     document.getElementById('preview').classList.remove('active');
 });
 
-// Save code to local storage (auto-save)
+// Save code to local storage
 const textareas = document.querySelectorAll('textarea');
 textareas.forEach(ta => {
     ta.addEventListener('input', function() {
@@ -99,7 +95,7 @@ textareas.forEach(ta => {
     });
 });
 
-// Load saved code on startup
+// Load saved code
 window.addEventListener('load', function() {
     textareas.forEach(ta => {
         const saved = localStorage.getItem(ta.id);
